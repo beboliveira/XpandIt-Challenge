@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -34,8 +35,18 @@ public class MovieController implements MovieAPI {
     }
 
     @Override
-    public ResponseEntity<HttpStatus> createMovie(Movie movie) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<HttpStatus> createMovie(@RequestBody Movie movie) {
+        try{
+            Movie m = movieRepository
+                    .save(new Movie(
+                            movie.getTitle(),
+                            movie.getLaunchDate(),
+                            movie.getRank(),
+                            movie.getRevenue()));
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override

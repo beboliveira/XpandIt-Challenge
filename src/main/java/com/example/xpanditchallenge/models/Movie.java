@@ -9,12 +9,16 @@ public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     @Column(name = "title")
     private String title;
+
     @Column(name = "launchDate")
     private LocalDate launchDate;
+
     @Column(name = "rank")
     private int rank;
+
     @Column(name = "revenue")
     private int revenue;
 
