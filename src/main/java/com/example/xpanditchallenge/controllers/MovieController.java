@@ -8,8 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +37,7 @@ public class MovieController implements MovieAPI {
     }
 
     @Override
-    public ResponseEntity<HttpStatus> createMovie(@RequestBody Movie movie) {
+    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
         try{
             Movie m = movieRepository
                     .save(new Movie(
@@ -43,24 +45,39 @@ public class MovieController implements MovieAPI {
                             movie.getLaunchDate(),
                             movie.getRank(),
                             movie.getRevenue()));
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(m, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public ResponseEntity<HttpStatus> updateMovie(long id, Movie movie) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<Movie> updateMovie(@PathVariable("id") long id, @RequestBody Movie movie) {
+        Optional<Movie> m = movieRepository.findById(id);
+        if (m.isPresent()){
+            Movie _m = m.get();
+            _m.setTitle(movie.getTitle());
+            _m.setLaunchDate(movie.getLaunchDate());
+            _m.setRank(movie.getRank());
+            _m.setRevenue(movie.getRevenue());
+            return new ResponseEntity<>(movieRepository.save(_m), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override
-    public ResponseEntity<HttpStatus> deleteMovie(long id) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<HttpStatus> deleteMovie(@PathVariable("id") long id) {
+        if (movieRepository.existsById(id)){
+            movieRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override
-    public ResponseEntity<List<Movie>> findByLaunchDate() {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<List<Movie>> findByLaunchDate(@RequestParam LocalDate launchDate){
+        return new ResponseEntity<>(movieRepository.findByLaunchDate(launchDate), HttpStatus.OK);
     }
 }

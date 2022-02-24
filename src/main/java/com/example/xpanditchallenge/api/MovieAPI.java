@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RequestMapping("/movies")
@@ -17,15 +19,15 @@ public interface MovieAPI {
     ResponseEntity<Movie> getMovieById(@PathVariable("id") long id);
 
     @PostMapping
-    ResponseEntity<HttpStatus> createMovie(@RequestBody Movie movie);
+    ResponseEntity<Movie> createMovie(@RequestBody Movie movie);
 
     @PutMapping("/{id}")
-    ResponseEntity<HttpStatus> updateMovie(@PathVariable("id") long id, @RequestBody Movie movie);
+    ResponseEntity<Movie> updateMovie(@PathVariable("id") long id, @RequestBody Movie movie);
 
     @DeleteMapping("/{id}")
     ResponseEntity<HttpStatus> deleteMovie(@PathVariable("id") long id);
 
     @GetMapping
-    ResponseEntity<List<Movie>> findByLaunchDate();
+    ResponseEntity<List<Movie>> findByLaunchDate(@RequestParam LocalDate launchDate);
 
 }
