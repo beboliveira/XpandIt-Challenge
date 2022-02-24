@@ -17,7 +17,7 @@ public class Movie {
     private LocalDate launchDate;
 
     @Column(name = "rank")
-    private int rank;
+    private float rank;
 
     @Column(name = "revenue")
     private int revenue;
@@ -28,7 +28,7 @@ public class Movie {
         this.rank = 0;
         this.revenue = 0;
     }
-    public Movie(String title, LocalDate launchDate, int rank, int revenue){
+    public Movie(String title, LocalDate launchDate, float rank, int revenue){
         this.title = title;
         this.launchDate = launchDate;
         this.rank = rank;
@@ -55,11 +55,11 @@ public class Movie {
         this.launchDate = launchDate;
     }
 
-    public int getRank() {
+    public float getRank() {
         return rank;
     }
 
-    public void setRank(int rank) {
+    public void setRank(float rank) {
         this.rank = rank;
     }
 

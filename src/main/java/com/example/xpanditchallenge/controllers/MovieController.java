@@ -1,6 +1,7 @@
 package com.example.xpanditchallenge.controllers;
 
 import com.example.xpanditchallenge.api.MovieAPI;
+import com.example.xpanditchallenge.exceptions.DuplicateTitleException;
 import com.example.xpanditchallenge.models.Movie;
 import com.example.xpanditchallenge.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,9 @@ public class MovieController implements MovieAPI {
     }
 
     @Override
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
-        try{
+    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) throws DuplicateTitleException {
+        try {
+            verifications(movie, true);
             Movie m = movieRepository
                     .save(new Movie(
                             movie.getTitle(),
@@ -46,24 +48,38 @@ public class MovieController implements MovieAPI {
                             movie.getRank(),
                             movie.getRevenue()));
             return new ResponseEntity<>(m, HttpStatus.OK);
+        }catch (IllegalArgumentException ie) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (DuplicateTitleException dt){
+            throw dt;
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public ResponseEntity<Movie> updateMovie(@PathVariable("id") long id, @RequestBody Movie movie) {
-        Optional<Movie> m = movieRepository.findById(id);
-        if (m.isPresent()){
-            Movie _m = m.get();
-            _m.setTitle(movie.getTitle());
-            _m.setLaunchDate(movie.getLaunchDate());
-            _m.setRank(movie.getRank());
-            _m.setRevenue(movie.getRevenue());
-            return new ResponseEntity<>(movieRepository.save(_m), HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Movie> updateMovie(@PathVariable("id") long id, @RequestBody Movie movie) throws DuplicateTitleException {
+        try{
+            verifications(movie, false);
+            Optional<Movie> m = movieRepository.findById(id);
+            if (m.isPresent()){
+                Movie _m = m.get();
+                _m.setTitle(movie.getTitle());
+                _m.setLaunchDate(movie.getLaunchDate());
+                _m.setRank(movie.getRank());
+                _m.setRevenue(movie.getRevenue());
+                return new ResponseEntity<>(movieRepository.save(_m), HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }catch (IllegalArgumentException ie) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (DuplicateTitleException dt){
+            throw dt;
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
     @Override
@@ -77,7 +93,19 @@ public class MovieController implements MovieAPI {
     }
 
     @Override
-    public ResponseEntity<List<Movie>> findByLaunchDate(@RequestParam LocalDate launchDate){
+    public ResponseEntity<List<Movie>> findByLaunchDate(@RequestParam String launchDateString){
+        LocalDate launchDate = LocalDate.parse(launchDateString);
         return new ResponseEntity<>(movieRepository.findByLaunchDate(launchDate), HttpStatus.OK);
+    }
+
+    private void verifications(Movie m, boolean isCreate) throws DuplicateTitleException {
+        if(m.getRevenue() < 0
+            || m.getRank() < 0 || m.getRank() > 10
+            || m.getLaunchDate().isAfter(LocalDate.now())){
+            throw new IllegalArgumentException();
+        }else if (isCreate && !movieRepository.findByTitle(m.getTitle()).isEmpty()){
+            throw new DuplicateTitleException
+                    ("There is another Movie with Title: " + m.getTitle());
+        }
     }
 }
