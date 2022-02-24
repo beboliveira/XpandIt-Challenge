@@ -3,7 +3,7 @@ package com.example.xpanditchallenge.controllers;
 import com.example.xpanditchallenge.api.MovieAPI;
 import com.example.xpanditchallenge.exceptions.DuplicateTitleException;
 import com.example.xpanditchallenge.models.Movie;
-import com.example.xpanditchallenge.repository.MovieRepository;
+import com.example.xpanditchallenge.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class MovieController implements MovieAPI {
 
     @Autowired
-    MovieRepository movieRepository;
+    MovieService movieService;
 
     @Override
     public ResponseEntity<String> test() {
@@ -29,7 +29,7 @@ public class MovieController implements MovieAPI {
 
     @Override
     public ResponseEntity<Movie> getMovieById(@PathVariable("id") long id){
-        Optional<Movie> movie = movieRepository.findById(id);
+        Optional<Movie> movie = movieService.getOne(id);
         if (movie.isPresent()) {
             return new ResponseEntity<>(movie.get(), HttpStatus.OK);
         } else  {
@@ -41,13 +41,8 @@ public class MovieController implements MovieAPI {
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) throws DuplicateTitleException {
         try {
             verifications(movie, true);
-            Movie m = movieRepository
-                    .save(new Movie(
-                            movie.getTitle(),
-                            movie.getLaunchDate(),
-                            movie.getRank(),
-                            movie.getRevenue()));
-            return new ResponseEntity<>(m, HttpStatus.OK);
+            Movie _movie = movieService.addOne(movie);
+            return new ResponseEntity<>(_movie, HttpStatus.OK);
         }catch (IllegalArgumentException ie) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }catch (DuplicateTitleException dt){
@@ -61,14 +56,9 @@ public class MovieController implements MovieAPI {
     public ResponseEntity<Movie> updateMovie(@PathVariable("id") long id, @RequestBody Movie movie) throws DuplicateTitleException {
         try{
             verifications(movie, false);
-            Optional<Movie> m = movieRepository.findById(id);
-            if (m.isPresent()){
-                Movie _m = m.get();
-                _m.setTitle(movie.getTitle());
-                _m.setLaunchDate(movie.getLaunchDate());
-                _m.setRank(movie.getRank());
-                _m.setRevenue(movie.getRevenue());
-                return new ResponseEntity<>(movieRepository.save(_m), HttpStatus.OK);
+            Optional<Movie> _m =  movieService.updateOne(id, movie);
+            if(_m.isPresent()){
+                return new ResponseEntity<>(_m.get(), HttpStatus.OK);
             }else{
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -84,8 +74,7 @@ public class MovieController implements MovieAPI {
 
     @Override
     public ResponseEntity<HttpStatus> deleteMovie(@PathVariable("id") long id) {
-        if (movieRepository.existsById(id)){
-            movieRepository.deleteById(id);
+        if (movieService.deleteOne(id)){
             return new ResponseEntity<>(HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -93,9 +82,11 @@ public class MovieController implements MovieAPI {
     }
 
     @Override
-    public ResponseEntity<List<Movie>> findByLaunchDate(@RequestParam String launchDateString){
-        LocalDate launchDate = LocalDate.parse(launchDateString);
-        return new ResponseEntity<>(movieRepository.findByLaunchDate(launchDate), HttpStatus.OK);
+    public ResponseEntity<List<Movie>> findByLaunchDate(@RequestParam String launchDate){
+        LocalDate lDate = LocalDate.parse(launchDate);
+        List<Movie> lst = movieService.findByLaunchDate(lDate);
+        return new ResponseEntity<>(lst, HttpStatus.OK);
+
     }
 
     private void verifications(Movie m, boolean isCreate) throws DuplicateTitleException {
@@ -103,7 +94,7 @@ public class MovieController implements MovieAPI {
             || m.getRank() < 0 || m.getRank() > 10
             || m.getLaunchDate().isAfter(LocalDate.now())){
             throw new IllegalArgumentException();
-        }else if (isCreate && !movieRepository.findByTitle(m.getTitle()).isEmpty()){
+        }else if (isCreate && !movieService.findByTitle(m).isEmpty()){
             throw new DuplicateTitleException
                     ("There is another Movie with Title: " + m.getTitle());
         }
