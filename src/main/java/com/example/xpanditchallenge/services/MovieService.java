@@ -42,17 +42,19 @@ public class MovieService {
     public boolean deleteOne(long id){
         if(!movieRepository.existsById(id))
             return false;
-
         movieRepository.deleteById(id);
-
         return true;
+    }
+
+    public boolean existsById(long id){
+        return movieRepository.existsById(id);
     }
 
     public List<Movie> findByLaunchDate(LocalDate launchDate){
         return movieRepository.findByLaunchDate(launchDate);
     }
 
-    public List<Movie> findByTitle(Movie movie){
-        return movieRepository.findByTitle(movie.getTitle());
+    public List<Movie> findByTitle(String movieTitle){
+        return movieRepository.findByTitle(movieTitle);
     }
 }

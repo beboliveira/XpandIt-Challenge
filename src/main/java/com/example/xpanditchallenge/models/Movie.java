@@ -35,6 +35,14 @@ public class Movie {
         this.revenue = revenue;
     }
 
+    public Movie(long id, String title, LocalDate launchDate, float rank, int revenue){
+        this.id = id;
+        this.title = title;
+        this.launchDate = launchDate;
+        this.rank = rank;
+        this.revenue = revenue;
+    }
+
     public long getId() {
         return id;
     }

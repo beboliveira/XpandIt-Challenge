@@ -15,6 +15,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,6 +28,7 @@ class XpandItChallengeApplicationTests {
 
     @MockBean
     private MovieRepository movieRepository;
+
 
     @Test
     void getBook() {
