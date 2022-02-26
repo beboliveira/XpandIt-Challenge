@@ -22,10 +22,6 @@ public class MovieController implements MovieAPI {
     @Autowired
     MovieService movieService;
 
-    @Override
-    public ResponseEntity<String> test() {
-        return new ResponseEntity<>("It's Working", HttpStatus.OK);
-    }
 
     @Override
     public ResponseEntity<Movie> getMovieById(@PathVariable("id") long id){

@@ -11,9 +11,6 @@ import java.util.List;
 @RequestMapping("/movies")
 public interface MovieAPI {
 
-    @GetMapping("/test")
-    ResponseEntity<String> test();
-
     @GetMapping("/{id}")
     ResponseEntity<Movie> getMovieById(@PathVariable("id") long id);
 
