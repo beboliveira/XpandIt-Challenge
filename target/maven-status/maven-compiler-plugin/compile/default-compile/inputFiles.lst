@@ -1,7 +1,0 @@
-/home/ferobecas/Desktop/XpandIt-Challenge/src/main/java/com/example/xpanditchallenge/repository/MovieRepository.java
-/home/ferobecas/Desktop/XpandIt-Challenge/src/main/java/com/example/xpanditchallenge/api/MovieAPI.java
-/home/ferobecas/Desktop/XpandIt-Challenge/src/main/java/com/example/xpanditchallenge/controllers/MovieController.java
-/home/ferobecas/Desktop/XpandIt-Challenge/src/main/java/com/example/xpanditchallenge/XpandItChallengeApplication.java
-/home/ferobecas/Desktop/XpandIt-Challenge/src/main/java/com/example/xpanditchallenge/exceptions/DuplicateTitleException.java
-/home/ferobecas/Desktop/XpandIt-Challenge/src/main/java/com/example/xpanditchallenge/services/MovieService.java
-/home/ferobecas/Desktop/XpandIt-Challenge/src/main/java/com/example/xpanditchallenge/models/Movie.java
