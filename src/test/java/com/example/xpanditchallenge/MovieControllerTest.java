@@ -22,8 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -143,8 +142,7 @@ public class MovieControllerTest {
     public void testUPDATE_then200() throws Exception {
         Movie m = new Movie("FF", LocalDate.parse("1999-03-12"), 3, 673);
 
-        Mockito.when(movieService.updateOne(1, m)).thenReturn(Optional.of(m));
-        Mockito.when(movieService.existsById(1)).thenReturn(true);
+        Mockito.when(movieService.updateOne(anyLong(), any(Movie.class))).thenReturn(Optional.of(m));
         Mockito.when(movieService.findByTitle(m.getTitle())).thenReturn(new ArrayList<>());
 
         MvcResult result = mvc.perform(put("/movies/1")
@@ -161,8 +159,7 @@ public class MovieControllerTest {
     public void testUPDATE_then400_BadRank() throws Exception {
         Movie m = new Movie("FF", LocalDate.parse("1999-03-12"), 11, 673);
 
-        Mockito.when(movieService.updateOne(1, m)).thenReturn(Optional.of(m));
-        Mockito.when(movieService.existsById(1)).thenReturn(true);
+        Mockito.when(movieService.updateOne(anyLong(), any(Movie.class))).thenReturn(Optional.of(m));
         Mockito.when(movieService.findByTitle(m.getTitle())).thenReturn(new ArrayList<>());
 
         mvc.perform(put("/movies/1")
@@ -175,8 +172,7 @@ public class MovieControllerTest {
     public void testUPDATE_then400_BadRevenue() throws Exception {
         Movie m = new Movie("FF", LocalDate.parse("1999-03-12"), 7, -673);
 
-        Mockito.when(movieService.updateOne(1, m)).thenReturn(Optional.of(m));
-        Mockito.when(movieService.existsById(1)).thenReturn(true);
+        Mockito.when(movieService.updateOne(anyLong(), any(Movie.class))).thenReturn(Optional.of(m));
         Mockito.when(movieService.findByTitle(m.getTitle())).thenReturn(new ArrayList<>());
 
         mvc.perform(put("/movies/1")
@@ -189,8 +185,7 @@ public class MovieControllerTest {
     public void testUPDATE_then400_BadDate() throws Exception {
         Movie m = new Movie("FF", LocalDate.parse("2024-03-12"), 5, 673);
 
-        Mockito.when(movieService.updateOne(1, m)).thenReturn(Optional.of(m));
-        Mockito.when(movieService.existsById(1)).thenReturn(true);
+        Mockito.when(movieService.updateOne(anyLong(), any(Movie.class))).thenReturn(Optional.of(m));
         Mockito.when(movieService.findByTitle(m.getTitle())).thenReturn(new ArrayList<>());
 
         mvc.perform(put("/movies/1")
@@ -201,7 +196,7 @@ public class MovieControllerTest {
 
     @Test
     public void testDELETE_then200() throws Exception {
-        Mockito.when(movieService.deleteOne(1)).thenReturn(true);
+        Mockito.when(movieService.deleteOne(anyLong())).thenReturn(true);
 
         mvc.perform(delete("/movies/1"))
                 .andExpect(status().isNoContent());
@@ -209,7 +204,7 @@ public class MovieControllerTest {
 
     @Test
     public void testDELETE_then404() throws Exception {
-        Mockito.when(movieService.deleteOne(1)).thenReturn(false);
+        Mockito.when(movieService.deleteOne(anyLong())).thenReturn(false);
 
         mvc.perform(delete("/movies/1"))
                 .andExpect(status().isNotFound());

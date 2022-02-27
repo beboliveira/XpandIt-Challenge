@@ -50,9 +50,9 @@ public class MovieController implements MovieAPI {
     public ResponseEntity<Movie> updateMovie(@PathVariable("id") long id, @RequestBody Movie movie) throws DuplicateTitleException {
         try{
             validation(movie, false);
-            if(movieService.existsById(id)){
-                movieService.updateOne(id, movie);
-                return new ResponseEntity<>(movie, HttpStatus.OK);
+            Optional<Movie> _m =  movieService.updateOne(id, movie);
+            if(_m.isPresent()){
+                return new ResponseEntity<>(_m.get(), HttpStatus.OK);
             }else{
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
